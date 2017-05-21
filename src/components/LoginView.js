@@ -1,23 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { compose, withState, withHandlers } from 'recompose'
+import injectSheet from 'react-jss'
+import classNames from 'classnames'
 import { replace } from 'react-router-redux'
 import { Link } from 'react-router'
 
 import { createOrUpdateUserProfile } from '../actions/users'
 import auth, { facebookProvider, googleProvider } from '../auth'
 
-const styles = {
-  loginView: {
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-  },
-}
+import { style } from '../styles/CentralForm'
 
 const enhance = compose(
   connect(),
+  injectSheet(style),
   withState('email', 'updateEmail', ''),
   withState('password', 'updatePassword', ''),
   withHandlers({
@@ -75,11 +71,12 @@ const enhance = compose(
   })
 )
 
-const LoginView = ({email, password, onEmailChange, onPasswordChange, onEmailSubmit, onFacebookSubmit, onGoogleSubmit}) => (
-  <div style={styles.loginView}>
-    <form id='emailPassword' onSubmit={onEmailSubmit}/>
+const LoginView = ({email, password, onEmailChange, classes, onPasswordChange, onEmailSubmit, onFacebookSubmit, onGoogleSubmit}) => (
+  <div className={classes.view}>
+    <form id='emailPassword' className={classes.form} onSubmit={onEmailSubmit}/>
     <input
       form='emailPassword'
+      className={classNames(classes.input, classes.inputText)}
       id='email'
       name='email'
       type='email'
@@ -88,20 +85,30 @@ const LoginView = ({email, password, onEmailChange, onPasswordChange, onEmailSub
       onChange={onEmailChange}/>
     <input
       form='emailPassword'
+      className={classNames(classes.input, classes.inputText)}
       id='password'
       name='password'
       type='password'
       placeholder='Password'
       value={password}
       onChange={onPasswordChange}/>
-    <input form='emailPassword' type='submit' value='Sign In'/>
-    <form id='facebook' onSubmit={onFacebookSubmit}/>
+    <input
+      form='emailPassword'
+      className={classes.input}
+      type='submit'
+      value='Sign In'/>
+    <form id='facebook' className={classes.form} onSubmit={onFacebookSubmit}/>
     <input
       form='facebook'
+      className={classes.input}
       type='submit'
       value='Sign in with Facebook'/>
-    <form id='google' onSubmit={onGoogleSubmit}/>
-    <input form='google' type='submit' value='Sign in with Google' />
+    <form id='google' className={classes.form} onSubmit={onGoogleSubmit}/>
+    <input
+      form='google'
+      className={classes.input}
+      type='submit'
+      value='Sign in with Google'/>
     <Link to='/a/register'>Register</Link>
   </div>
 )
