@@ -1,6 +1,7 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { compose } from 'recompose'
+import { compose, withContext } from 'recompose'
 
 import { updateUser } from '../actions/users'
 
@@ -37,12 +38,25 @@ const enhance = compose(
   withNotFound(
     (props) => (props.users[props.userId] === null),
     UserNotFound
+  ),
+  withContext(
+    {
+      baseUrl: PropTypes.string.isRequired,
+      userId: PropTypes.string.isRequired,
+    },
+    (props) => ({
+      baseUrl: props.baseUrl,
+      userId: props.userId,
+    })
   )
 )
 
-const UserView = ({children, userId, users}) => (
-  <div>
-    {JSON.stringify(users[userId])}
+const UserView = ({baseUrl, isEditable=false, children, userId, users}) => (
+  <div style={{display: 'flex', flexDirection: 'row'}}>
+    <img
+      style={{alignSelf: 'flex-start'}}
+      src='http://placekitten.com/g/200/200'
+      alt={`${users[userId].username}`} />
     {children}
   </div>
 )
