@@ -1,32 +1,89 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import Hls from 'hls.js'
+import keyMirror from 'keymirror'
 
-import { updateTime } from '../reducers/videoStreams'
+
+export const videoStates = keyMirror({
+  PLAYING: null,
+  PAUSED: null,
+  WAITING: null,
+})
 
 export const styles = {
   video: {
-    padding: '1em',
+    backgroundColor:'#222222',
     maxWidth: '100%',
     maxHeight: '100%',
   }
 }
 
 
-const VideoStream = ({ video, dispatch }) => (
-  <video
-    style={styles.video}
-    controls
-    onTimeUpdate={(event) => dispatch(updateTime(event.target.currentTime))}
-    ><source src={video['url']} />
-  </video>
-)
+class VideoStream extends React.Component {
+  render() {
+    return (
+      <div style={this.props.style}>
+        <video
+          ref={(video) => {this.video=video}}
+          style={styles.video}
+          height={`${Math.round(this.props.scaleWidth * this.props.scale / this.props.aspectRatio)}px`}
+          width={`${Math.round(this.props.scaleWidth * this.props.scale)}px`}
+          onTimeUpdate={this.props.onTimeUpdate}
+          onLoadedMetadata={(event) => {this.props.updateMaxTime(event.target.duration)}}
+          >
+        </video>
+      </div>
+    )
+  }
+  componentDidMount() {
+    if(Hls.isSupported()) {
+      this.hls = new Hls()
+      this.hls.attachMedia(this.video)
+      this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+        console.log("video and hls.js are now bound together !")
+      })
+      //FIXME: extract this so that it obeys environments
+      this.hls.loadSource(`https://us-central1-iotv-1e541.cloudfunctions.net/videos/${this.props.videoId}/index.m3u8`)
+      this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+        console.log("manifest loaded, found " + data.levels.length + " quality level")
+      })
+      this.hls.on(Hls.Events.FRAG_BUFFERED, (event, data) => {
+        console.log("level loaded")
+        this.props.onLoaded()
+      })
+      console.log(this.hls)
+    }
+    console.log(`Hls is supported: ${Hls.isSupported()}`)
+    if (this.props.performanceState.videosState === videoStates.PLAYING) {
+      this.video.play()
+    }
+  }
 
-VideoStream.propTypes = {
-  video: PropTypes.shape({
-    url: PropTypes.string.isRequired
-  }).isRequired,
-  dispatch: PropTypes.func.isRequired,
+  componentDidUpdate() {
+    switch (this.props.performanceState.videosState) {
+      case videoStates.PLAYING:
+        console.log('Attempting to play')
+        this.video.play()
+        break
+      case videoStates.PAUSED:
+        this.video.pause()
+        break
+      default:
+        break
+    }
+  }
 }
 
-export default connect()(VideoStream);
+VideoStream.defaultProps = {
+    aspectRatio: 16/9,
+    scale: 1.0,
+    scaleWidth: 1920
+  }
+
+VideoStream.propTypes = {
+  videoId: PropTypes.string.isRequired,
+  onTimeUpdate: PropTypes.func.isRequired,
+  updateMaxTime: PropTypes.func.isRequired,
+}
+
+export default VideoStream

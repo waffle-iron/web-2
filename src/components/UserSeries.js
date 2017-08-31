@@ -1,19 +1,17 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { compose, getContext } from 'recompose'
 
-import UserNav from './UserNav'
+import UserNav, { navLinks } from './UserNav'
+import { context } from './UserView'
 
 
 const enhanceSubs = compose(
-  getContext({
-    baseUrl: PropTypes.string.isRequired
-  }),
+  getContext(context),
 )
 
 const UserSeries = ({baseUrl}) => (
   <div>
-    <UserNav baseUrl={baseUrl} active="Series" />
+    <UserNav baseUrl={baseUrl} active={navLinks.series} />
   </div>
 )
 

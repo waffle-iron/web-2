@@ -1,25 +1,28 @@
-import { combineReducers } from 'redux'
-import { routerReducer } from 'react-router-redux'
-import { combineEpics } from 'redux-observable'
+import {combineReducers} from 'redux'
+import {routerReducer} from 'react-router-redux'
 
+import asyncCreate from './asyncCreate'
 import auth from './auth'
 import comments from './comments'
+import emojis from './emojis'
+import groups from './groups'
 import users from './users'
 import userVideos from './userVideos'
 import videos from './videos'
-import videoComments from './videoComments'
+import performanceComments from './performanceComments'
 import videoStreamsContainer from './videoStreams'
 
-export const rootEpic = combineEpics(
-);
 
 export const rootReducer = combineReducers({
+  asyncCreate,
   auth,
   comments,
+  emojis,
+  groups,
   users,
   userVideos,
   videos,
-  videoComments,
+  performanceComments,
   videoStreamsContainer,
   routing: routerReducer,
 });

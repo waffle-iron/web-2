@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { compose, withContext } from 'recompose'
+import { compose, defaultProps, withContext } from 'recompose'
 
 import { updateUser } from '../actions/users'
 
@@ -19,8 +19,16 @@ const UserNotFound = () => (
   <div>User not found</div>
 )
 
+
+export const context = {
+  baseUrl: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired,
+  isEditable: PropTypes.bool,
+}
+
 const enhance = compose(
   connect(mapStateToProps),
+  defaultProps({isEditable: false}),
   withDatabaseSubscribe(
     'value',
     (props) => (`users/${props.userId}`),
@@ -40,11 +48,7 @@ const enhance = compose(
     UserNotFound
   ),
   withContext(
-    {
-      baseUrl: PropTypes.string.isRequired,
-      userId: PropTypes.string.isRequired,
-      isEditable: PropTypes.bool,
-    },
+    context,
     (props) => ({
       baseUrl: props.baseUrl,
       userId: props.userId,
@@ -53,10 +57,10 @@ const enhance = compose(
   )
 )
 
-const UserView = ({baseUrl, isEditable=false, children, userId, users}) => (
+const UserView = ({baseUrl, isEditable, children, userId, users}) => (
   <div style={{display: 'flex', flexDirection: 'row'}}>
     <img
-      style={{alignSelf: 'flex-start'}}
+      style={{alignSelf: 'flex-start', borderRadius: '0.5em'}}
       src='http://placekitten.com/g/200/200'
       alt={`${users[userId].username}`} />
     {children}

@@ -1,8 +1,8 @@
-import { actionTypes } from '../actions/comments';
+import { actionTypes } from '../actions/comments'
 
-const initalState = {}
+const initialState = {}
 
-const reducer = (state=initalState, action) => {
+const reducer = (state=initialState, action) => {
   switch (action.type) {
     case actionTypes.UPDATE_COMMENT:
       return {
@@ -10,8 +10,8 @@ const reducer = (state=initalState, action) => {
         [action.commentId]: action.commentSnapshot,
       }
     default:
-      return state;
+      return state
   }
 }
 
-export default reducer;
+export default reducer
